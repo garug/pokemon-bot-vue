@@ -10,7 +10,7 @@
         {{
           ((index === 1 ? data.p1 : data.p2).inBattle.hp /
             (index === 1 ? data.p1 : data.p2).inBattle.totalHp) *
-          100
+            100
         }}
         <div class="lifebar">
           <div
@@ -29,9 +29,11 @@
           :class="{
             defeated: (index === 1 ? data.p1 : data.p2).inBattle.hp <= 0,
           }"
-          :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${
-            (index === 1 ? data.p1 : data.p2).inBattle.number
-          }.gif`"
+          :src="
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${
+              (index === 1 ? data.p1 : data.p2).inBattle.number
+            }.gif`
+          "
         />
       </div>
       <ul class="otherPokemon">
@@ -43,7 +45,9 @@
             v-if="otherPokemon"
             class="bank"
             :class="{ defeated: otherPokemon.hp <= 0 }"
-            :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-viii/icons/${otherPokemon.number}.png`"
+            :src="
+              `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-viii/icons/${otherPokemon.number}.png`
+            "
           />
           <img
             v-else
@@ -52,6 +56,14 @@
         </li>
       </ul>
     </article>
+  </section>
+  <section>
+    <h1 v-if="result === identity" style="color: green">
+      You Win!!
+    </h1>
+    <h1 v-if="result && result !== identity" style="color: red">
+      You Lose!!
+    </h1>
   </section>
   <article class="moves">
     <h1>Choose a move</h1>
@@ -101,6 +113,7 @@ const Batalha = defineComponent({
     const key = ref(route.params.id as string);
     const battleKey = ref("");
     const identity = ref<"p1" | "p2">("p1");
+    const winner = ref<"p1" | "p2" | undefined>();
 
     socket.emit("connect-battle", key.value);
     socket.on("roomNotFind", () => router.push("/"));
@@ -124,7 +137,13 @@ const Batalha = defineComponent({
       data.p2.pokemon.length = 6;
     });
 
+    socket.on("event", (event) =>
+      data.turns[data.turns.length - 1].push(event)
+    );
+
     socket.on("events", (events) => (data.turns = events));
+
+    socket.on("winner", (w) => (winner.value = w));
 
     socket.on("identity", (i) => (identity.value = i));
 
@@ -143,17 +162,18 @@ const Batalha = defineComponent({
     });
 
     socket.on("resultDamage", (result) => {
-      const pokemon =
-        data.p1.inBattle.id === result.target
-          ? data.p1.inBattle
-          : data.p2.inBattle;
+      const player: "p1" | "p2" = result.target;
+      data[player].inBattle.hp -= result.damage;
+    });
 
-      pokemon.hp -= result.damage;
+    socket.on("pokemonDefeated", (e) => {
+      const pokemon = data.available.find((a: any) => a.id === e.pokemon.id);
+      if (pokemon) pokemon.hp = 0;
     });
 
     const data = reactive({
-      turns: [],
-      available: [],
+      turns: [] as String[][],
+      available: [] as any,
       moves: [],
       p1: {
         inBattle: {
@@ -190,7 +210,7 @@ const Batalha = defineComponent({
         value,
       });
     };
-    return { data, identity, registerAction };
+    return { data, identity, winner, registerAction };
   },
 });
 
@@ -237,6 +257,8 @@ export default Batalha;
 
 .otherPokemon li {
   list-style: none;
+  display: flex;
+  justify-content: center;
 }
 
 .bank {

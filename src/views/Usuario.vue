@@ -1,14 +1,58 @@
 <template>
+  <section>
+    <article class="national">
+      <h1>Dex</h1>
+      <p>{{ uniquePokemon.length }}/{{ length }}</p>
+    </article>
+  </section>
   <p>This user have catched {{ (user.pokemon || []).length }} pokemon</p>
-  <p>Currently dex: {{ uniquePokemon.length }}/{{ length }}</p>
-  <section class="all-pokemon">
+  <section>
+    <h1>All pokemon</h1>
+    <table class="pokemon-table" v-if="user.pokemon">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Species</th>
+          <th>Total Stats</th>
+          <th>ID</th>
+        </tr>
+      </thead>
+      <tr
+        v-for="pokemon in [...user.pokemon].splice((filters.page - 1) * 10, 10)"
+        :key="pokemon.id"
+      >
+        <td>
+          <img
+          class="pokemon-img"
+            :src="
+              `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-viii/icons/${pokemon.number}.png`
+            "
+          />
+        </td>
+        <td>{{ pokemon.name }}</td>
+        <td>{{ pokemon.total.toFixed(0) }}</td>
+        <td>012345</td>
+      </tr>
+    </table>
+
+    <button :disabled="filters.page === 1" @click="filters.page--">Prev</button>
+    <button
+      :disabled="(user.pokemon || []).length / 10 <= filters.page"
+      @click="filters.page++"
+    >
+      Next
+    </button>
+  </section>
+  <!-- <section class="all-pokemon">
     <article
       v-for="pokemon in allPokemon"
       :key="pokemon.name"
       class="individual"
     >
       <img
-        :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.number}.png`"
+        :src="
+          `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.number}.png`
+        "
         :alt="pokemon.pokemon.name"
         :class="isCatched(pokemon.pokemon.name) && 'catched'"
       />
@@ -17,11 +61,11 @@
       </h1>
       <h2 class="number">#{{ `${pokemon.number}`.padStart(3, "0") }}</h2>
     </article>
-  </section>
+  </section> -->
 </template>
 
 <script>
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, reactive } from "vue";
 import axios from "axios";
 import { useRoute } from "vue-router";
 
@@ -33,6 +77,9 @@ const Usuario = defineComponent({
     const length = ref(151);
     const page = useRoute();
     const user = ref({});
+    const filters = reactive({
+      page: 1,
+    });
 
     const isCatched = (name) => {
       return user.value.pokemon.some((p) => p.name === name);
@@ -60,7 +107,7 @@ const Usuario = defineComponent({
       });
     });
 
-    return { isCatched, uniquePokemon, length, user, allPokemon };
+    return { isCatched, uniquePokemon, length, user, allPokemon, filters };
   },
 });
 
@@ -74,6 +121,14 @@ export default Usuario;
   gap: 20px;
   max-width: 1920px;
   margin: 0 auto;
+}
+
+.pokemon-table {
+  width: 100%;
+}
+
+.pokemon-img {
+  min-height: 56px;
 }
 
 @media (min-width: 1024px) {
