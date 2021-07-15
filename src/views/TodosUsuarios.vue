@@ -1,6 +1,7 @@
 <template>
   <section>
     <h1>All pokemon</h1>
+    <input v-model="filters.search" type="text" />
     <table class="pokemon-table" v-if="user.pokemon">
       <thead>
         <tr>
@@ -8,15 +9,19 @@
           <th>Species</th>
           <th>Total Stats</th>
           <th>ID</th>
+          <th>Trainer</th>
         </tr>
       </thead>
       <tr
-        v-for="pokemon in [...user.pokemon].splice((filters.page - 1) * 10, 10)"
+        v-for="pokemon in [...filteredPokemon].splice(
+          (filters.page - 1) * 10,
+          10
+        )"
         :key="pokemon.id"
       >
         <td>
           <img
-          class="pokemon-img"
+            class="pokemon-img"
             :src="
               `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-viii/icons/${pokemon.number}.png`
             "
@@ -25,6 +30,7 @@
         <td>{{ pokemon.name }}</td>
         <td>{{ pokemon.total.toFixed(0) }}</td>
         <td>012345</td>
+        <td>{{ pokemon.user }}</td>
       </tr>
     </table>
 
@@ -58,7 +64,14 @@
 </template>
 
 <script>
-import { computed, defineComponent, onMounted, ref, reactive } from "vue";
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  ref,
+  reactive,
+  watchEffect,
+} from "vue";
 import axios from "axios";
 import { useRoute } from "vue-router";
 
@@ -69,8 +82,11 @@ const Usuario = defineComponent({
     const allPokemon = ref([]);
     const length = ref(151);
     const page = useRoute();
-    const user = ref({});
+    const user = reactive({
+      pokemon: [],
+    });
     const filters = reactive({
+      search: "",
       page: 1,
     });
 
@@ -78,9 +94,9 @@ const Usuario = defineComponent({
       return user.value.pokemon.some((p) => p.name === name);
     };
 
-    const uniquePokemon = computed(() => {
-      const arr = user.value.pokemon || [];
-      return [...new Set(arr.map((e) => e.name))];
+    const filteredPokemon = computed(() => {
+      const arr = user.pokemon || [];
+      return arr.filter((e) => e.name.includes(filters.search));
     });
 
     onMounted(async () => {
@@ -89,7 +105,7 @@ const Usuario = defineComponent({
         axios.get(`https://pokeapi.co/api/v2/pokemon/?limit=${length.value}`),
       ]);
 
-      user.value = userReq.data;
+      user.pokemon = userReq.data.pokemon;
 
       allPokemon.value = allPkmnReq.data.results.map((p, i) => {
         return {
@@ -100,7 +116,14 @@ const Usuario = defineComponent({
       });
     });
 
-    return { isCatched, uniquePokemon, length, user, allPokemon, filters };
+    return {
+      isCatched,
+      length,
+      user,
+      allPokemon,
+      filters,
+      filteredPokemon,
+    };
   },
 });
 
