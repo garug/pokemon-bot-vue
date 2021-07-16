@@ -36,7 +36,7 @@
 
     <button :disabled="filters.page === 1" @click="filters.page--">Prev</button>
     <button
-      :disabled="(user.pokemon || []).length / 10 <= filters.page"
+      :disabled="filteredPokemon.length / 10 <= filters.page"
       @click="filters.page++"
     >
       Next
@@ -70,6 +70,7 @@ import {
   onMounted,
   ref,
   reactive,
+  watch,
   watchEffect,
 } from "vue";
 import axios from "axios";
@@ -81,7 +82,6 @@ const Usuario = defineComponent({
   setup() {
     const allPokemon = ref([]);
     const length = ref(151);
-    const page = useRoute();
     const user = reactive({
       pokemon: [],
     });
@@ -98,6 +98,11 @@ const Usuario = defineComponent({
       const arr = user.pokemon || [];
       return arr.filter((e) => e.name.includes(filters.search));
     });
+
+    watch(
+      () => filters.search,
+      () => (filters.page = 1)
+    );
 
     onMounted(async () => {
       const [userReq, allPkmnReq] = await Promise.all([
