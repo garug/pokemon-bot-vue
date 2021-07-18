@@ -74,15 +74,17 @@
       </tr>
     </table>
 
-    <MainButton :disabled="filters.page == 1" @click="filters.page--">
-      Prev
-    </MainButton>
-    <MainButton
-      :disabled="filteredPokemon.length / 10 <= filters.page"
-      @click="filters.page++"
-    >
-      Next
-    </MainButton>
+    <div>
+      <MainButton :disabled="filters.page == 1" @click="filters.page--">
+        Prev
+      </MainButton>
+      <MainButton
+        :disabled="filteredPokemon.length / 10 <= filters.page"
+        @click="filters.page++"
+      >
+        Next
+      </MainButton>
+    </div>
   </section>
   <div
     v-if="isMissingVisible"
@@ -174,7 +176,7 @@ const Usuario = defineComponent({
 
     const uniquePokemon = computed(() => {
       const arr = user.pokemon || [];
-      return [...new Set(arr)];
+      return [...new Set(arr.map((e) => e.number))];
     });
 
     const missingPokemon = computed(() =>
@@ -299,7 +301,7 @@ export default Usuario;
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 16px;
+  padding-top: 16px;
   margin-bottom: 16px;
 }
 

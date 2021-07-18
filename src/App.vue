@@ -11,10 +11,12 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background: #ededed;
+  min-height: 100vh;
 }
 
 a {
-  color: #DA0037;
+  color: #da0037;
   text-decoration: none;
   cursor: pointer;
 
