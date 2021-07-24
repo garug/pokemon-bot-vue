@@ -101,6 +101,7 @@
 import { useSocket } from "@/socket";
 import { defineComponent, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import axios from "axios";
 
 const Batalha = defineComponent({
   name: "Batalha",
@@ -114,6 +115,10 @@ const Batalha = defineComponent({
     const battleKey = ref("");
     const identity = ref<"p1" | "p2">("p1");
     const winner = ref<"p1" | "p2" | undefined>();
+
+    axios.post(`${process.env.VUE_APP_BACKEND_URL}/battles`, {
+      id: key,
+    });
 
     socket.emit("connect-battle", key.value);
     socket.on("roomNotFind", () => router.push("/"));

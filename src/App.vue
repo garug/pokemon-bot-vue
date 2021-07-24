@@ -1,40 +1,54 @@
 <template>
-  <router-view />
+  <q-layout class="bg-grey-2">
+    <DefaultHeader />
+    <q-page-container class="content">
+      <router-view />
+    </q-page-container>
+  </q-layout>
 </template>
 
+<script lang="ts">
+import { defineComponent } from "vue";
+import { getCookie, userStorage } from "./storage";
+import axios from "axios";
+
+import DefaultHeader from "./components/Header.vue";
+
+export default defineComponent({
+  name: "App",
+
+  components: {
+    DefaultHeader,
+  },
+
+  async beforeMount() {
+    const refresh_token = getCookie("refresh");
+
+    if (!refresh_token) return;
+
+    const token = await axios.post(
+      `${process.env.VUE_APP_BACKEND_URL}/refresh`,
+      {
+        refresh_token,
+      }
+    );
+    const userInfo = await axios.post(
+      `${process.env.VUE_APP_BACKEND_URL}/@me`,
+      token.data
+    );
+    userStorage.setToken(token.data);
+    userStorage.setUserInfo(userInfo.data);
+  },
+});
+</script>
+
 <style lang="scss">
-@import url("./assets/css/reset.css");
-
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  background: #ededed;
-  min-height: 100vh;
+.content {
+  max-width: 1920px;
+  margin: 0 auto;
 }
 
-a {
-  color: #da0037;
-  text-decoration: none;
-  cursor: pointer;
-
-  &:hover {
-    color: #af2d2d;
-  }
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+.bg-pattern {
+  background-image: url("./assets/pattern.png") !important;
 }
 </style>

@@ -13,17 +13,17 @@ export default Button;
 </script>
 
 <style lang="scss" scoped>
-.button {
-  background-color: #DA0037;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
-}
+// .button {
+//   background-color: #DA0037;
+//   padding: 8px 16px;
+//   border: none;
+//   border-radius: 4px;
+//   color: white;
+//   cursor: pointer;
+// }
 
-.button:disabled {
-  background-color: #eee;
-  color: #4e4e4e;
-}
+// .button:disabled {
+//   background-color: #dedede;
+//   color: #444;
+// }
 </style>

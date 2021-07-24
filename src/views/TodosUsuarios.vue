@@ -1,66 +1,52 @@
 <template>
   <section>
-    <h1>All pokemon</h1>
-    <input v-model="filters.search" type="text" />
-    <table class="pokemon-table" v-if="user.pokemon">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Species</th>
-          <th>Total Stats</th>
-          <th>ID</th>
-          <th>Trainer</th>
-        </tr>
-      </thead>
-      <tr
-        v-for="pokemon in [...filteredPokemon].splice(
-          (filters.page - 1) * 10,
-          10
-        )"
-        :key="pokemon.id"
-      >
-        <td>
-          <img
-            class="pokemon-img"
+    <q-table
+      :rows="user.pokemon || []"
+      :columns="columns"
+      flat
+      row-key="id"
+      :filter="filters.search"
+      :pagination="pagination"
+    >
+      <template v-slot:top>
+        <q-input
+          dense
+          color="primary"
+          v-model="filters.search"
+          placeholder="Search by species..."
+        >
+          <template v-slot:append>
+            <q-icon name="fas fa-search" />
+          </template>
+        </q-input>
+      </template>
+      <template v-slot:body-cell-picture="props">
+        <q-td style="min-width: 100px" :props="props">
+          <q-img
+            height="56px"
+            fit="none"
             :src="
-              `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-viii/icons/${pokemon.number}.png`
+              `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-viii/icons/${props.row.number}.png`
             "
           />
-        </td>
-        <td>{{ pokemon.name }}</td>
-        <td>{{ pokemon.total.toFixed(0) }}</td>
-        <td>012345</td>
-        <td>{{ pokemon.user }}</td>
-      </tr>
-    </table>
+        </q-td>
+      </template>
 
-    <button :disabled="filters.page === 1" @click="filters.page--">Prev</button>
-    <button
-      :disabled="filteredPokemon.length / 10 <= filters.page"
-      @click="filters.page++"
-    >
-      Next
-    </button>
+      <template v-slot:body-cell-id="props">
+        <q-td :props="props">
+          <q-badge color="grey">
+            {{ props.row.id }}
+          </q-badge>
+        </q-td>
+      </template>
+
+      <template v-slot:body-cell-number="props">
+        <q-td :props="props">
+          <q-badge color="grey"> #{{ props.row.number }} </q-badge>
+        </q-td>
+      </template>
+    </q-table>
   </section>
-  <!-- <section class="all-pokemon">
-    <article
-      v-for="pokemon in allPokemon"
-      :key="pokemon.name"
-      class="individual"
-    >
-      <img
-        :src="
-          `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.number}.png`
-        "
-        :alt="pokemon.pokemon.name"
-        :class="isCatched(pokemon.pokemon.name) && 'catched'"
-      />
-      <h1>
-        {{ isCatched(pokemon.pokemon.name) ? pokemon.pokemon.name : "?" }}
-      </h1>
-      <h2 class="number">#{{ `${pokemon.number}`.padStart(3, "0") }}</h2>
-    </article>
-  </section> -->
 </template>
 
 <script>
@@ -89,6 +75,38 @@ const Usuario = defineComponent({
       search: "",
       page: 1,
     });
+
+    const columns = [
+      {
+        name: "number",
+        required: true,
+        label: "Nº",
+        align: "center",
+        field: (row) => row.number,
+        sortable: true,
+      },
+      {
+        name: "picture",
+        required: true,
+        align: "center",
+      },
+      {
+        name: "species",
+        field: "name",
+        label: "Species",
+      },
+      {
+        name: "stats",
+        label: "Total Stats",
+        field: (row) => row.total.toFixed(0),
+        sortable: true,
+      },
+      {
+        name: "id",
+        label: "ID",
+      },
+      { name: "user", field: "user", label: "idUser" },
+    ];
 
     const isCatched = (name) => {
       return user.value.pokemon.some((p) => p.name === name);
@@ -123,6 +141,7 @@ const Usuario = defineComponent({
 
     return {
       isCatched,
+      columns,
       length,
       user,
       allPokemon,
@@ -146,10 +165,6 @@ export default Usuario;
 
 .pokemon-table {
   width: 100%;
-}
-
-.pokemon-img {
-  min-height: 56px;
 }
 
 @media (min-width: 1024px) {
