@@ -1,15 +1,28 @@
 // It's highly recommended to change the default colors
 // to match your app's branding.
 
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
 $primary   : #da0037;
 $secondary : #26A69A;
 $accent    : #9C27B0;
 
-$dark      : #4a4a4a;
+$dark      : #181A20;
+$dark-1    : #0E1015;
+$dark-2    : #353940;
+$text-white: #E2E4E9;
+$text-dark : #656565;
 
 $positive  : #21BA45;
 $negative  : #C10015;
 $info      : #31CCEC;
 $warning   : #F2C037;
+
+@mixin header-font {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bolder;
+    text-transform: uppercase;
+    margin: 0;
+}
 
 @import '~quasar-variables-styl'

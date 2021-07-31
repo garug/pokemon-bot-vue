@@ -1,4 +1,4 @@
-import { ref, watchEffect } from "vue";
+import { ref, watchEffect, readonly } from "vue";
 import axios from "axios";
 
 interface Token {
@@ -26,7 +26,9 @@ interface UserInfo {
 export class UserStorage {
   private token = ref<Token | undefined>(undefined);
 
-  userInfo = ref<UserInfo | undefined>(undefined);
+  private _userInfo = ref<UserInfo | undefined>(undefined);
+
+  userInfo = readonly(this._userInfo);
 
   constructor() {
     watchEffect(() => {
@@ -42,7 +44,7 @@ export class UserStorage {
   }
 
   setUserInfo(userInfo?: UserInfo) {
-    this.userInfo.value = userInfo;
+    this._userInfo.value = userInfo;
   }
 
   async revokeToken() {

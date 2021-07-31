@@ -9,6 +9,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/TodosUsuarios.vue"),
   },
   {
+    path: "/market",
+    name: "Mercado",
+    component: () => import("../views/Market.vue"),
+  },
+  {
     path: "/oauth",
     name: "Redirect Oauth uri",
     component: () => import("../views/TodosUsuarios.vue"),

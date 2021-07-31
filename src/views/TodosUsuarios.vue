@@ -1,52 +1,38 @@
 <template>
-  <section>
-    <q-table
-      :rows="user.pokemon || []"
-      :columns="columns"
-      flat
-      row-key="id"
-      :filter="filters.search"
-      :pagination="pagination"
-    >
-      <template v-slot:top>
-        <q-input
-          dense
-          color="primary"
-          v-model="filters.search"
-          placeholder="Search by species..."
+  <q-page-container>
+    <section style="display: flex">
+      <div class="sidebar-container">
+        <div
+          class="sidebar q-pa-sm"
+          :style="{ top: state.headerVisible ? '50px' : 0 }"
         >
-          <template v-slot:append>
-            <q-icon name="fas fa-search" />
-          </template>
-        </q-input>
-      </template>
-      <template v-slot:body-cell-picture="props">
-        <q-td style="min-width: 100px" :props="props">
-          <q-img
-            height="56px"
-            fit="none"
-            :src="
-              `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-viii/icons/${props.row.number}.png`
-            "
+          <q-input
+            dense
+            color="primary"
+            v-model="filters.search"
+            placeholder="Search by species..."
+          >
+            <template v-slot:append>
+              <q-icon name="fas fa-search" />
+            </template>
+          </q-input>
+        </div>
+      </div>
+      <div style="max-width: calc(100vw - 300px)">
+        <q-infinite-scroll
+          ref="infiniteScroll"
+          @load="onScroll"
+          class="flex q-gutter-sm q-pa-sm"
+        >
+          <PokemonCard
+            :pokemon="pokemon"
+            v-for="pokemon in filteredPokemon"
+            :key="pokemon.id"
           />
-        </q-td>
-      </template>
-
-      <template v-slot:body-cell-id="props">
-        <q-td :props="props">
-          <q-badge color="grey">
-            {{ props.row.id }}
-          </q-badge>
-        </q-td>
-      </template>
-
-      <template v-slot:body-cell-number="props">
-        <q-td :props="props">
-          <q-badge color="grey"> #{{ props.row.number }} </q-badge>
-        </q-td>
-      </template>
-    </q-table>
-  </section>
+        </q-infinite-scroll>
+      </div>
+    </section>
+  </q-page-container>
 </template>
 
 <script>
@@ -57,69 +43,45 @@ import {
   ref,
   reactive,
   watch,
-  watchEffect,
 } from "vue";
 import axios from "axios";
-import { useRoute } from "vue-router";
+import { iconSrc } from "@/utils/pokemon";
+import { state } from "@/storage/state";
+import PokemonCard from "@/components/PokemonCard";
 
 const Usuario = defineComponent({
   name: "Usuario",
 
+  components: {
+    PokemonCard,
+  },
+
   setup() {
     const allPokemon = ref([]);
     const length = ref(151);
+    const infiniteScroll = ref(null);
     const user = reactive({
       pokemon: [],
     });
+
+    const amount = ref(50);
+
     const filters = reactive({
       search: "",
-      page: 1,
     });
 
-    const columns = [
-      {
-        name: "number",
-        required: true,
-        label: "Nº",
-        align: "center",
-        field: (row) => row.number,
-        sortable: true,
-      },
-      {
-        name: "picture",
-        required: true,
-        align: "center",
-      },
-      {
-        name: "species",
-        field: "name",
-        label: "Species",
-      },
-      {
-        name: "stats",
-        label: "Total Stats",
-        field: (row) => row.total.toFixed(0),
-        sortable: true,
-      },
-      {
-        name: "id",
-        label: "ID",
-      },
-      { name: "user", field: "user", label: "idUser" },
-    ];
-
-    const isCatched = (name) => {
-      return user.value.pokemon.some((p) => p.name === name);
-    };
-
     const filteredPokemon = computed(() => {
-      const arr = user.pokemon || [];
-      return arr.filter((e) => e.name.includes(filters.search));
+      return [...(user.pokemon || [])]
+        .filter((e) => e.name.includes(filters.search))
+        .splice(0, amount.value);
     });
 
     watch(
       () => filters.search,
-      () => (filters.page = 1)
+      () => {
+        amount.value = 50;
+        infiniteScroll.value.poll();
+      }
     );
 
     onMounted(async () => {
@@ -139,14 +101,21 @@ const Usuario = defineComponent({
       });
     });
 
+    function onScroll(index, done) {
+      amount.value += 30;
+      done();
+    }
+
     return {
-      isCatched,
-      columns,
+      state,
       length,
+      infiniteScroll,
       user,
       allPokemon,
       filters,
       filteredPokemon,
+      iconSrc,
+      onScroll,
     };
   },
 });
@@ -155,61 +124,13 @@ export default Usuario;
 </script>
 
 <style lang="scss" scoped>
-.all-pokemon {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  max-width: 1920px;
-  margin: 0 auto;
+.sidebar-container {
+  width: 300px;
 }
 
-.pokemon-table {
+.sidebar {
+  transition: all ease 0.1s;
+  position: sticky;
   width: 100%;
-}
-
-@media (min-width: 1024px) {
-  .all-pokemon {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (min-width: 1600px) {
-  .all-pokemon {
-    grid-template-columns: repeat(6, 1fr);
-  }
-}
-
-.individual {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  padding: 8px;
-  display: flex;
-  position: relative;
-  overflow: hidden;
-}
-
-.individual h1 {
-  font-size: 24px;
-}
-
-.individual .number {
-  font-size: 48px;
-  bottom: 0;
-  right: 5px;
-  position: absolute;
-  margin: 0;
-  color: rgba(0, 0, 0, 0.05);
-  font-weight: bolder;
-}
-
-.all-pokemon img {
-  filter: grayscale(1);
-  width: 50%;
-  opacity: 0.5;
-}
-
-.all-pokemon .catched {
-  filter: none;
-  opacity: 1;
 }
 </style>

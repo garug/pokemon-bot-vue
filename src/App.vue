@@ -1,9 +1,7 @@
 <template>
-  <q-layout class="bg-grey-2">
+  <q-layout class="bg-main">
     <DefaultHeader />
-    <q-page-container class="content">
-      <router-view />
-    </q-page-container>
+    <router-view />
   </q-layout>
 </template>
 
@@ -43,12 +41,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.content {
-  max-width: 1920px;
-  margin: 0 auto;
-}
-
 .bg-pattern {
   background-image: url("./assets/pattern.png") !important;
+}
+
+.bg-main {
+  background: $dark-1;
 }
 </style>

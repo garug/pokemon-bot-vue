@@ -1,16 +1,22 @@
 <template>
-  <q-header reveal class="bg-pattern text-white">
+  <q-header reveal @reveal="setVisibility" class="bg-pattern text-white">
     <q-toolbar class="content">
       <q-toolbar-title> </q-toolbar-title>
       <div class="q-gutter-md q-mr-xl">
         <router-link
           custom
           v-for="item in menuItems"
-          :to="item.route"
+          :to="item.route()"
           :key="item.name"
           v-slot="{ navigate }"
         >
-          <q-btn @click="navigate" flat round :icon="item.icon" />
+          <q-btn
+            @click="navigate"
+            v-if="item.visible()"
+            flat
+            round
+            :icon="item.icon"
+          />
         </router-link>
       </div>
       <q-btn
@@ -52,6 +58,7 @@
 
 <script lang="ts">
 import { userStorage } from "@/storage";
+import { state } from "@/storage/state";
 import { defineComponent } from "vue";
 
 const DefaultHeader = defineComponent({
@@ -60,11 +67,17 @@ const DefaultHeader = defineComponent({
   methods: {
     openDiscordUrl() {
       document.cookie = `lastUrl=${this.$route.fullPath};path=/`;
-      window.open(process.env.VUE_APP_DISCORD_REDIRECT_URL, "_self");
+      const url =
+        "https://discord.com/api/oauth2/authorize?client_id=855825211826896906&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Foauth&response_type=code&scope=identify";
+      window.open(url, "_self");
     },
 
     logout() {
       userStorage.revokeToken();
+    },
+
+    setVisibility(value: boolean) {
+      state.headerVisible = value;
     },
   },
 
@@ -74,12 +87,20 @@ const DefaultHeader = defineComponent({
         {
           name: "Home",
           icon: "fas fa-home",
-          route: "/",
+          route: () => "/",
+          visible: () => true,
+        },
+        {
+          name: "Profile",
+          icon: "fas fa-user",
+          route: () => `/usuarios/${userStorage.userInfo.value?.id}`,
+          visible: () => userStorage.userInfo.value?.id,
         },
         {
           name: "Market",
           icon: "fas fa-bullhorn",
-          route: "/market",
+          route: () => "/market",
+          visible: () => true,
         },
       ],
       user: userStorage.userInfo,
