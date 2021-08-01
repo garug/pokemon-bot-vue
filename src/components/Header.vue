@@ -67,9 +67,7 @@ const DefaultHeader = defineComponent({
   methods: {
     openDiscordUrl() {
       document.cookie = `lastUrl=${this.$route.fullPath};path=/`;
-      const url =
-        "https://discord.com/api/oauth2/authorize?client_id=855825211826896906&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Foauth&response_type=code&scope=identify";
-      window.open(url, "_self");
+      window.open(process.env.VUE_APP_DISCORD_REDIRECT_URL, "_self");
     },
 
     logout() {
