@@ -185,12 +185,12 @@ article h1 {
   font-size: 9px;
   color: #fff;
   background-color: #000;
-  opacity: 10%;
+  opacity: 0.1;
 }
 
 .pokemon-dialog .pokemon-badge {
   font-size: 12px;
-  opacity: 20%;
+  opacity: 0.2;
 }
 
 .pokemon-dialog {
