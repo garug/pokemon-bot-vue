@@ -11,7 +11,24 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/market",
     name: "Mercado",
-    component: () => import("../views/Market.vue"),
+    component: () =>
+      import(/* webpackChunkName: "market" */ "../views/Market.vue"),
+    children: [
+      {
+        path: "available",
+        component: () =>
+          import(
+            /* webpackChunkName: "market" */ "../components/market/MarketAvailable.vue"
+          ),
+      },
+      {
+        path: "offers",
+        component: () =>
+          import(
+            /* webpackChunkName: "market" */ "../components/market/MarketOffers.vue"
+          ),
+      },
+    ],
   },
   {
     path: "/oauth",

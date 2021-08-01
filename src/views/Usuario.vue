@@ -182,10 +182,22 @@ const Usuario = defineComponent({
       iconSrc,
       filteredPokemon,
       onScroll,
-      infiniteScroll
+      infiniteScroll,
     };
   },
 });
 
 export default Usuario;
 </script>
+
+<style lang="scss" scoped>
+.sidebar-container {
+  width: 300px;
+}
+
+.sidebar {
+  transition: all ease 0.1s;
+  position: sticky;
+  width: 100%;
+}
+</style>

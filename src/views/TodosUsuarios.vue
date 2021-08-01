@@ -22,6 +22,8 @@
         <q-infinite-scroll
           ref="infiniteScroll"
           @load="onScroll"
+          :offset="160"
+          :debounce="100"
           class="flex q-gutter-sm q-pa-sm"
         >
           <PokemonCard
@@ -63,8 +65,7 @@ const Usuario = defineComponent({
     const user = reactive({
       pokemon: [],
     });
-
-    const amount = ref(50);
+    const amount = ref(10);
 
     const filters = reactive({
       search: "",
@@ -79,30 +80,22 @@ const Usuario = defineComponent({
     watch(
       () => filters.search,
       () => {
-        amount.value = 50;
+        amount.value = 10;
         infiniteScroll.value.poll();
       }
     );
 
     onMounted(async () => {
-      const [userReq, allPkmnReq] = await Promise.all([
-        axios.get(`${process.env.VUE_APP_BACKEND_URL}/users/`),
-        axios.get(`https://pokeapi.co/api/v2/pokemon/?limit=${length.value}`),
-      ]);
+      const userReq = await axios.get(
+        `${process.env.VUE_APP_BACKEND_URL}/users/`
+      );
 
       user.pokemon = userReq.data.pokemon;
-
-      allPokemon.value = allPkmnReq.data.results.map((p, i) => {
-        return {
-          pokemon: p,
-          number: i + 1,
-          catched: userReq.data.pokemon.some((p2) => p2.name === p.name),
-        };
-      });
+      console.log(infiniteScroll.value);
     });
 
     function onScroll(index, done) {
-      amount.value += 30;
+      amount.value += 10;
       done();
     }
 

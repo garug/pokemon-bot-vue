@@ -23,10 +23,6 @@
   </div>
 
   <q-dialog v-model="detailed">
-    <q-card class="pokemon-dialog"> </q-card>
-  </q-dialog>
-
-  <q-dialog v-model="detailed">
     <q-card style="width: 600; max-width: 80vw;">
       <q-card-section class="pokemon-dialog">
         <div class="col-auto flex column items-center">
@@ -159,13 +155,13 @@ article h1 {
   transition: all linear 0.1s;
   transition: all linear 0.1s 0.1s;
   transform: translateY(0);
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
 }
 
 .pokemon-card:hover,
 .pokemon-card.detailed {
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.8);
   transition: all linear 0.1s;
 }
 
