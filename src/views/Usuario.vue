@@ -126,7 +126,7 @@ const Usuario = defineComponent({
       done();
     }
 
-    const length = ref(151);
+    const length = ref(251);
     const isMissingVisible = ref(false);
     const page = useRoute();
     const user = reactive({

@@ -60,7 +60,7 @@ const Usuario = defineComponent({
 
   setup() {
     const allPokemon = ref([]);
-    const length = ref(151);
+    const length = ref(251);
     const infiniteScroll = ref(null);
     const user = reactive({
       pokemon: [],
