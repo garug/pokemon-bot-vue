@@ -158,11 +158,13 @@ const Usuario = defineComponent({
     );
 
     onMounted(async () => {
+      infiniteScroll.value.stop();
       const [userReq] = await Promise.all([
         axios.get(`${process.env.VUE_APP_BACKEND_URL}/users/${page.params.id}`),
       ]);
 
       user.pokemon = userReq.data.pokemon;
+      infiniteScroll.value.resume();
     });
 
     return {
