@@ -1,5 +1,6 @@
 import { ref, watchEffect, readonly } from "vue";
 import axios from "axios";
+import { state } from "./state";
 
 interface Token {
   access_token: string;
@@ -40,6 +41,7 @@ export class UserStorage {
   }
 
   setToken(token: Token) {
+    state.logged = true;
     this.token.value = token;
   }
 
@@ -52,6 +54,7 @@ export class UserStorage {
       token: this.token.value?.access_token,
     });
     document.cookie = `refresh=;path=/`;
+    state.logged = false;
     this.setUserInfo(undefined);
   }
 }

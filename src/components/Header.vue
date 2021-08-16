@@ -71,7 +71,7 @@ const DefaultHeader = defineComponent({
     },
 
     logout() {
-      userStorage.revokeToken();
+      userStorage().revokeToken();
     },
 
     setVisibility(value: boolean) {
@@ -91,8 +91,8 @@ const DefaultHeader = defineComponent({
         {
           name: "Profile",
           icon: "fas fa-user",
-          route: () => `/usuarios/${userStorage.userInfo.value?.id}`,
-          visible: () => userStorage.userInfo.value?.id,
+          route: () => `/usuarios/${userStorage().userInfo.value?.id}`,
+          visible: () => userStorage().userInfo.value?.id,
         },
         {
           name: "Market",
@@ -101,7 +101,7 @@ const DefaultHeader = defineComponent({
           visible: () => true,
         },
       ],
-      user: userStorage.userInfo,
+      user: userStorage().userInfo,
     };
   },
 

@@ -30,9 +30,20 @@
             :pokemon="pokemon"
             v-for="pokemon in filteredPokemon"
             :key="pokemon.id"
+            @click="openDetail(pokemon)"
           />
         </q-infinite-scroll>
       </div>
+      <q-dialog
+        v-model="showingDetail"
+        transition-show="jump-up"
+        transition-hide="jump-down"
+      >
+        <PokemonDetailed
+          style="width: 600px; max-width: 80vw;"
+          :pokemon="detailedPokemon"
+        />
+      </q-dialog>
     </section>
   </q-page-container>
 </template>
@@ -50,12 +61,14 @@ import axios from "axios";
 import { iconSrc } from "@/utils/pokemon";
 import { state } from "@/storage/state";
 import PokemonCard from "@/components/PokemonCard";
+import PokemonDetailed from "@/components/PokemonDetailed.vue";
 
 const Usuario = defineComponent({
   name: "Usuario",
 
   components: {
     PokemonCard,
+    PokemonDetailed,
   },
 
   setup() {
@@ -70,6 +83,14 @@ const Usuario = defineComponent({
     const filters = reactive({
       search: "",
     });
+
+    const showingDetail = ref(false);
+    const detailedPokemon = ref(undefined);
+
+    function openDetail(pokemon) {
+      detailedPokemon.value = pokemon;
+      showingDetail.value = true;
+    }
 
     const filteredPokemon = computed(() => {
       return [...(user.pokemon || [])]
@@ -110,6 +131,9 @@ const Usuario = defineComponent({
       filteredPokemon,
       iconSrc,
       onScroll,
+      showingDetail,
+      openDetail,
+      detailedPokemon,
     };
   },
 });

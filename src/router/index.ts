@@ -13,6 +13,7 @@ const routes: Array<RouteRecordRaw> = [
     name: "Mercado",
     component: () =>
       import(/* webpackChunkName: "market" */ "../views/Market.vue"),
+    redirect: "/market/available",
     children: [
       {
         path: "available",
@@ -48,8 +49,8 @@ const routes: Array<RouteRecordRaw> = [
           `${process.env.VUE_APP_BACKEND_URL}/@me`,
           token.data
         );
-        userStorage.setToken(token.data);
-        userStorage.setUserInfo(userInfo.data);
+        userStorage().setToken(token.data);
+        userStorage().setUserInfo(userInfo.data);
       }
 
       next(getCookie("lastUrl") || "/");

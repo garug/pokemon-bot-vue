@@ -19,7 +19,7 @@
     </div>
     <div style="max-width: calc(100vw - 300px)">
       <q-infinite-scroll
-        scroll-target="body"
+        :scroll-target="infiniteScrollRef"
         ref="infiniteScroll"
         @load="onScroll"
         :offset="160"
@@ -27,34 +27,41 @@
         class="flex q-gutter-sm q-pa-sm"
       >
         <PokemonCard
+          v-ripple
+          @click="openDetail(pokemon)"
           :pokemon="pokemon"
           v-for="pokemon in filteredPokemon"
           :key="pokemon.id"
         />
       </q-infinite-scroll>
     </div>
+    <q-dialog
+      v-model="showingDetail"
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
+      <PokemonDetailed
+        style="width: 600px; max-width: 80vw;"
+        :pokemon="detailedPokemon"
+      />
+    </q-dialog>
   </section>
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  onUpdated,
-  reactive,
-  ref,
-  watch,
-} from "vue";
+import { computed, defineComponent, reactive, ref, watch } from "vue";
 
 import PokemonCard from "@/components/PokemonCard.vue";
+import PokemonDetailed from "@/components/PokemonDetailed.vue";
 import { state } from "@/storage/state";
+import { userStorage } from "@/storage";
 
 const PokemonBox = defineComponent({
   name: "PokemonBox",
 
   components: {
     PokemonCard,
+    PokemonDetailed,
   },
 
   props: {
@@ -62,9 +69,14 @@ const PokemonBox = defineComponent({
       type: Array as () => Array<any>,
       default: () => [],
     },
+    infiniteScrollRef: {
+      type: String,
+      default: "body",
+    },
   },
 
   setup(props) {
+    const detailed = ref(false);
     const amount = ref(10);
     const filters = reactive({
       search: "",
@@ -73,6 +85,7 @@ const PokemonBox = defineComponent({
 
     const filteredPokemon = computed(() => {
       return [...props.pokemonList]
+        .filter((e) => e.user !== userStorage().userInfo.value?.id)
         .filter((e) => e.name.includes(filters.search))
         .splice(0, amount.value);
     });
@@ -80,6 +93,14 @@ const PokemonBox = defineComponent({
     function onScroll(_index: number, done: () => void) {
       amount.value += 10;
       done();
+    }
+
+    const showingDetail = ref(false);
+    const detailedPokemon = ref(undefined);
+
+    function openDetail(pokemon: any) {
+      detailedPokemon.value = pokemon;
+      showingDetail.value = true;
     }
 
     watch(
@@ -91,12 +112,16 @@ const PokemonBox = defineComponent({
     );
 
     return {
+      detailed,
       amount,
       filters,
       filteredPokemon,
       infiniteScroll,
       onScroll,
       state,
+      showingDetail,
+      openDetail,
+      detailedPokemon,
     };
   },
 });

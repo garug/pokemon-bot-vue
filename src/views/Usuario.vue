@@ -50,9 +50,20 @@
             :pokemon="pokemon"
             v-for="pokemon in filteredPokemon"
             :key="pokemon.id"
+            @click="openDetail(pokemon)"
           />
         </q-infinite-scroll>
       </div>
+      <q-dialog
+        v-model="showingDetail"
+        transition-show="jump-up"
+        transition-hide="jump-down"
+      >
+        <PokemonDetailed
+          style="width: 600px; max-width: 80vw;"
+          :pokemon="detailedPokemon"
+        />
+      </q-dialog>
     </section>
   </q-page-container>
   <q-dialog v-model="isMissingVisible">
@@ -85,7 +96,7 @@
   </q-dialog>
 </template>
 
-<script>
+<script lang="ts">
 import {
   computed,
   watch,
@@ -99,6 +110,7 @@ import { useRoute } from "vue-router";
 import MainButton from "../components/Button.vue";
 import Header from "../components/Header.vue";
 import PokemonCard from "../components/PokemonCard.vue";
+import PokemonDetailed from "../components/PokemonDetailed.vue";
 import { userStorage } from "@/storage";
 import { iconSrc } from "@/utils/pokemon";
 import { state } from "@/storage/state";
@@ -110,27 +122,36 @@ const Usuario = defineComponent({
     Header,
     MainButton,
     PokemonCard,
+    PokemonDetailed,
   },
 
   setup() {
     const amount = ref(50);
-    const infiniteScroll = ref(null);
+    const infiniteScroll = ref<any>(null);
     const filteredPokemon = computed(() => {
       return [...(user.pokemon || [])]
-        .filter((e) => e.name.includes(filters.search))
+        .filter((e: any) => e.name.includes(filters.search))
         .splice(0, amount.value);
     });
 
-    function onScroll(index, done) {
+    function onScroll(index: any, done: () => void) {
       amount.value += 30;
       done();
     }
 
     const length = ref(251);
     const isMissingVisible = ref(false);
+    const showingDetail = ref<any>(false);
+    const detailedPokemon = ref(undefined);
+
+    function openDetail(pokemon: any) {
+      detailedPokemon.value = pokemon;
+      showingDetail.value = true;
+    }
+
     const page = useRoute();
     const user = reactive({
-      info: userStorage.userInfo,
+      info: userStorage().userInfo,
       pokemon: [],
     });
 
@@ -142,19 +163,19 @@ const Usuario = defineComponent({
       () => filters.search,
       () => {
         amount.value = 50;
-        infiniteScroll.value.poll();
+        infiniteScroll.value?.poll();
       }
     );
 
     const uniquePokemon = computed(() => {
       const arr = user.pokemon || [];
-      return [...new Set(arr.map((e) => e.number))];
+      return [...new Set(arr.map((e: any) => e.number))];
     });
 
     const missingPokemon = computed(() =>
       Array.from({ length: length.value })
         .map((_, i) => i + 1)
-        .filter((n) => !user.pokemon.some((p) => p.number === n))
+        .filter((n) => !user.pokemon.some((p: any) => p.number === n))
     );
 
     onMounted(async () => {
@@ -185,6 +206,9 @@ const Usuario = defineComponent({
       filteredPokemon,
       onScroll,
       infiniteScroll,
+      showingDetail,
+      openDetail,
+      detailedPokemon,
     };
   },
 });

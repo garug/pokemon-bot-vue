@@ -34,8 +34,8 @@ export default defineComponent({
       `${process.env.VUE_APP_BACKEND_URL}/@me`,
       token.data
     );
-    userStorage.setToken(token.data);
-    userStorage.setUserInfo(userInfo.data);
+    userStorage().setToken(token.data);
+    userStorage().setUserInfo(userInfo.data);
   },
 });
 </script>
