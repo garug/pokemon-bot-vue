@@ -49,6 +49,18 @@ export class UserStorage {
     this._userInfo.value = userInfo;
   }
 
+  getHeaders() {
+    if (!this.token.value) {
+      return {};
+    }
+
+    const { token_type, access_token } = this.token.value;
+
+    return {
+      Authorization: `${token_type} ${access_token}`,
+    };
+  }
+
   async revokeToken() {
     await axios.post(`${process.env.VUE_APP_BACKEND_URL}/logout`, {
       token: this.token.value?.access_token,
