@@ -29,7 +29,7 @@
         <div class="pokemon-offer-container">
           <i class="icon pokemon-sending fas fa-level-up-alt"></i>
           <PokemonCard v-if="sendingPokemon" :pokemon="sendingPokemon" />
-          <p v-else>Choose a pokemon to sent</p>
+          <p v-else>Choose a pokémon to send</p>
         </div>
       </div>
     </q-card-section>

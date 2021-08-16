@@ -24,7 +24,6 @@
         <q-card-section class="pokemon-dialog">
           <div>
             <div class="col-auto flex column items-center">
-              <p>sending</p>
               <h1 class="pokemon-name">{{ detailedOffer.sentPokemon.name }}</h1>
               <div class="col-auto">
                 <q-img
@@ -81,7 +80,6 @@
           </div>
           <div>
             <div class="col-auto flex column items-center">
-              <p>receiving</p>
               <h1 class="pokemon-name">
                 {{ detailedOffer.retrievedPokemon.name }}
               </h1>
