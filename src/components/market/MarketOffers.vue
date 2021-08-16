@@ -199,7 +199,7 @@ const MarketOffers = defineComponent({
       if (!id) return;
       const req = await getOffers(id);
       const [offers] = partition(req.data, {
-        offeror: id,
+        owner: id,
       });
       myOffers.value = offers;
     }
