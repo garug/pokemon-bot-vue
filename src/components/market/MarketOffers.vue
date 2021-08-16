@@ -198,7 +198,6 @@ const MarketOffers = defineComponent({
       const id = userStorage().userInfo.value?.id;
       if (!id) return;
       const req = await getOffers(id);
-      console.log(req.data);
       const [offers] = partition(req.data, {
         offeror: id,
       });
