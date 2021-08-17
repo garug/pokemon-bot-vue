@@ -48,7 +48,7 @@
   </q-page-container>
 </template>
 
-<script>
+<script lang="ts">
 import {
   computed,
   defineComponent,
@@ -60,8 +60,9 @@ import {
 import axios from "axios";
 import { iconSrc } from "@/utils/pokemon";
 import { state } from "@/storage/state";
-import PokemonCard from "@/components/PokemonCard";
+import PokemonCard from "@/components/PokemonCard.vue";
 import PokemonDetailed from "@/components/PokemonDetailed.vue";
+import { getPokemon } from "@/services/pokemon";
 
 const Usuario = defineComponent({
   name: "Usuario",
@@ -74,9 +75,9 @@ const Usuario = defineComponent({
   setup() {
     const allPokemon = ref([]);
     const length = ref(251);
-    const infiniteScroll = ref(null);
+    const infiniteScroll = ref<any | undefined>(undefined);
     const user = reactive({
-      pokemon: [],
+      pokemon: [] as any[],
     });
     const amount = ref(10);
 
@@ -87,7 +88,7 @@ const Usuario = defineComponent({
     const showingDetail = ref(false);
     const detailedPokemon = ref(undefined);
 
-    function openDetail(pokemon) {
+    function openDetail(pokemon: any) {
       detailedPokemon.value = pokemon;
       showingDetail.value = true;
     }
@@ -102,7 +103,7 @@ const Usuario = defineComponent({
       () => filters.search,
       () => {
         amount.value = 10;
-        infiniteScroll.value.poll();
+        infiniteScroll.value?.poll();
       }
     );
 
@@ -116,7 +117,7 @@ const Usuario = defineComponent({
       infiniteScroll.value.resume();
     });
 
-    function onScroll(index, done) {
+    function onScroll(index: any, done: () => {}) {
       amount.value += 10;
       done();
     }
