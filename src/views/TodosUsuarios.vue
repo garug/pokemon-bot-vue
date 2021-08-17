@@ -102,7 +102,6 @@ const Usuario = defineComponent({
       return pokemonReq.data;
     }
 
-    onMounted(async () => loadData(1));
     watch(() => filters.search, throttle(resetData, 250));
 
     function onScroll(index: any, done: (stop: boolean) => {}) {
