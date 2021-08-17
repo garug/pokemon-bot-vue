@@ -48,21 +48,14 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  ref,
-  reactive,
-  watch,
-} from "vue";
-import axios from "axios";
+import { throttle } from "lodash";
+import { defineComponent, ref, reactive, watch } from "vue";
+
 import { iconSrc } from "@/utils/pokemon";
 import { state } from "@/storage/state";
 import PokemonCard from "@/components/PokemonCard.vue";
 import PokemonDetailed from "@/components/PokemonDetailed.vue";
 import { getPokemon } from "@/services/pokemon";
-import { debounce, throttle } from "lodash";
 
 const Usuario = defineComponent({
   name: "Usuario",
@@ -105,6 +98,7 @@ const Usuario = defineComponent({
     watch(() => filters.search, throttle(resetData, 250));
 
     function onScroll(index: any, done: (stop: boolean) => {}) {
+      // TODO preencher com placeholders, dispensando necessidade da requisição
       loadData(index).then((loadedData) => {
         done(loadedData.length === 0);
       });
