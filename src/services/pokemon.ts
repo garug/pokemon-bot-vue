@@ -4,6 +4,7 @@ interface PokemonFilters {
   userId?: string;
   name?: string;
   limit?: number;
+  page?: number;
 }
 
 export async function getPokemon(filters: PokemonFilters) {
