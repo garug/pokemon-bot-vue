@@ -23,12 +23,11 @@
           ref="infiniteScroll"
           @load="onScroll"
           :offset="160"
-          :debounce="100"
           class="flex q-gutter-sm q-pa-sm"
         >
           <PokemonCard
             :pokemon="pokemon"
-            v-for="pokemon in filteredPokemon"
+            v-for="pokemon in allPokemon"
             :key="pokemon.id"
             @click="openDetail(pokemon)"
           />
@@ -48,7 +47,7 @@
   </q-page-container>
 </template>
 
-<script>
+<script lang="ts">
 import {
   computed,
   defineComponent,
@@ -60,8 +59,10 @@ import {
 import axios from "axios";
 import { iconSrc } from "@/utils/pokemon";
 import { state } from "@/storage/state";
-import PokemonCard from "@/components/PokemonCard";
+import PokemonCard from "@/components/PokemonCard.vue";
 import PokemonDetailed from "@/components/PokemonDetailed.vue";
+import { getPokemon } from "@/services/pokemon";
+import { debounce, throttle } from "lodash";
 
 const Usuario = defineComponent({
   name: "Usuario",
@@ -72,13 +73,9 @@ const Usuario = defineComponent({
   },
 
   setup() {
-    const allPokemon = ref([]);
+    const allPokemon = ref<any[]>([]);
     const length = ref(251);
-    const infiniteScroll = ref(null);
-    const user = reactive({
-      pokemon: [],
-    });
-    const amount = ref(10);
+    const infiniteScroll = ref<any | undefined>(undefined);
 
     const filters = reactive({
       search: "",
@@ -87,48 +84,39 @@ const Usuario = defineComponent({
     const showingDetail = ref(false);
     const detailedPokemon = ref(undefined);
 
-    function openDetail(pokemon) {
+    function openDetail(pokemon: any) {
       detailedPokemon.value = pokemon;
       showingDetail.value = true;
     }
 
-    const filteredPokemon = computed(() => {
-      return [...(user.pokemon || [])]
-        .filter((e) => e.name.includes(filters.search))
-        .splice(0, amount.value);
-    });
-
-    watch(
-      () => filters.search,
-      () => {
-        amount.value = 10;
-        infiniteScroll.value.poll();
-      }
-    );
-
-    onMounted(async () => {
-      infiniteScroll.value.stop();
-      const userReq = await axios.get(
-        `${process.env.VUE_APP_BACKEND_URL}/users/`
-      );
-
-      user.pokemon = userReq.data.pokemon;
+    function resetData() {
+      allPokemon.value = [];
+      infiniteScroll.value.reset();
       infiniteScroll.value.resume();
-    });
+    }
 
-    function onScroll(index, done) {
-      amount.value += 10;
-      done();
+    async function loadData(page: number) {
+      const pokemonReq = await getPokemon({ page, name: filters.search });
+      allPokemon.value.push(...pokemonReq.data);
+
+      return pokemonReq.data;
+    }
+
+    onMounted(async () => loadData(1));
+    watch(() => filters.search, throttle(resetData, 250));
+
+    function onScroll(index: any, done: (stop: boolean) => {}) {
+      loadData(index).then((loadedData) => {
+        done(loadedData.length === 0);
+      });
     }
 
     return {
       state,
       length,
       infiniteScroll,
-      user,
       allPokemon,
       filters,
-      filteredPokemon,
       iconSrc,
       onScroll,
       showingDetail,

@@ -86,7 +86,7 @@ const CreateOfferPokemon = defineComponent({
         user: userStorage().userInfo.value?.id,
       };
       const request = await getPokemon(sentFilters);
-      availablePokemon.value = request.data.pokemon;
+      availablePokemon.value = request.data;
     }
 
     async function confirmOffer() {
