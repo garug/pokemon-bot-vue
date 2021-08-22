@@ -139,7 +139,7 @@ const Usuario = defineComponent({
       done();
     }
 
-    const length = ref(251);
+    const length = ref(386);
     const isMissingVisible = ref(false);
     const showingDetail = ref<any>(false);
     const detailedPokemon = ref(undefined);
