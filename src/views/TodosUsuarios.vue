@@ -67,7 +67,7 @@ const Usuario = defineComponent({
 
   setup() {
     const allPokemon = ref<any[]>([]);
-    const length = ref(386);
+    const length = ref(493);
     const infiniteScroll = ref<any | undefined>(undefined);
 
     const filters = reactive({
